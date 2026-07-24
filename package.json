@@ -1,0 +1,17 @@
+{
+  "name": "turbopack-double-exec-repro",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "build:webpack": "next build --webpack",
+    "start": "next start -p 9030"
+  },
+  "dependencies": {
+    "lib-l": "file:packages/lib-l-1.0.0.tgz",
+    "next": "16.2.11",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}
