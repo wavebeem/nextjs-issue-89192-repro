@@ -1,0 +1,13 @@
+{
+  "name": "nextjs-issue-89192-repro",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "forwardPorts": [9030],
+  "portsAttributes": {
+    "9030": {
+      "label": "repro demo",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm install",
+  "postAttachCommand": "npm run build && npm run start"
+}

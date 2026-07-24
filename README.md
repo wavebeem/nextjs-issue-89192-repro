@@ -52,11 +52,13 @@ curl localhost:9030/api/p
 curl localhost:9030/b
 ```
 
-Or run it without cloning: importing this repo into a CodeSandbox Devbox
-(https://codesandbox.io/p/github/wavebeem/nextjs-issue-89192-repro)
-auto-installs, builds, and starts the production server via
-`.codesandbox/tasks.json`---the `count=1/2/3` log lines show up in the task
-terminal and the preview opens the demo page.
+Or run it without cloning, in a GitHub Codespace:
+https://codespaces.new/wavebeem/nextjs-issue-89192-repro?quickstart=1
+
+The devcontainer auto-installs, builds, and starts the production server on
+attach---watch the terminal for the `[lib-l] state module executed, count=N`
+lines, and open the forwarded port 9030 for the demo page. (If the server
+isn't running, just run `npm run build && npm run start` manually.)
 
 Requires Node 20+ (anything that runs Next.js 16).
 
