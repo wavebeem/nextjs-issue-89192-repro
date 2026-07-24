@@ -4,11 +4,10 @@ export const dynamic = "force-dynamic";
 
 export function GET() {
   return Response.json({
-    route: "app router /check",
+    route: "/check",
     pid: process.pid,
     execCount: getExecCount(),
-    tokenFromAppIsToken: isToken(globalThis.__TOKEN_FROM_APP),
-    tokenFromPagesIsToken: isToken(globalThis.__TOKEN_FROM_PAGES),
+    tokenFromRouteIsToken: isToken(globalThis.__TOKEN_FROM_ROUTE),
     tokenFromInstrumentationIsToken: isToken(
       globalThis.__TOKEN_FROM_INSTRUMENTATION
     ),

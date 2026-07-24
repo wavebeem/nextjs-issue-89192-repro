@@ -3,9 +3,8 @@
 import { useState } from "react";
 
 const steps = [
-  { path: "/create", label: "App Router route creates a Token" },
-  { path: "/api/create", label: "Pages Router route creates a Token" },
-  { path: "/check", label: "App Router route checks every token" },
+  { path: "/create", label: "route handler creates a Token" },
+  { path: "/check", label: "route handler checks both tokens" },
 ];
 
 function Verdict({ report }) {
@@ -15,12 +14,8 @@ function Verdict({ report }) {
       text: `lib-l executed ${report.execCount} time(s) in pid ${report.pid} (expected: 1)`,
     },
     {
-      ok: report.tokenFromAppIsToken,
-      text: "Token from the App Router route is instanceof Token",
-    },
-    {
-      ok: report.tokenFromPagesIsToken,
-      text: "Token from the Pages Router route is instanceof Token",
+      ok: report.tokenFromRouteIsToken,
+      text: "Token from the route handler is instanceof Token",
     },
     {
       ok: report.tokenFromInstrumentationIsToken,
@@ -87,8 +82,8 @@ export function Demo() {
             </div>
           ))}
           <p>
-            The server log shows each execution as it happens:{" "}
-            <code>[lib-l] module executed, count=N</code>
+            The server terminal logs each execution as it happens, with a
+            running count.
           </p>
         </>
       )}
