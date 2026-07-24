@@ -52,10 +52,13 @@ curl localhost:9030/api/p
 curl localhost:9030/b
 ```
 
-The repo also has a `.codesandbox/tasks.json`, so importing it into a
-CodeSandbox Devbox (`codesandbox.io/p/github/<owner>/<repo>`) auto-installs,
-builds, and starts the production server---the `count=1/2/3` log lines show up
-in the task terminal and the preview opens the demo page.
+Or run it without cloning: importing this repo into a CodeSandbox Devbox
+(https://codesandbox.io/p/github/wavebeem/nextjs-issue-89192-repro)
+auto-installs, builds, and starts the production server via
+`.codesandbox/tasks.json`---the `count=1/2/3` log lines show up in the task
+terminal and the preview opens the demo page.
+
+Requires Node 20+ (anything that runs Next.js 16).
 
 **Expected:** the server log shows `count=1` once, and `/b` reports
 `isBaseToken(...) === true` for every token.
