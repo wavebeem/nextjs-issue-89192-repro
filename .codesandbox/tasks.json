@@ -1,0 +1,23 @@
+{
+  "setupTasks": [
+    {
+      "name": "Install dependencies",
+      "command": "npm install"
+    }
+  ],
+  "tasks": {
+    "start": {
+      "name": "Build + start (Turbopack)",
+      "command": "npm run build && npm run start",
+      "runAtStart": true,
+      "preview": {
+        "port": 9030
+      }
+    },
+    "start:webpack": {
+      "name": "Build + start (webpack control)",
+      "command": "npm run build:webpack && npm run start",
+      "runAtStart": false
+    }
+  }
+}

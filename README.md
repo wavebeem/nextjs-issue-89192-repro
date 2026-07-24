@@ -52,15 +52,19 @@ curl localhost:9030/api/p
 curl localhost:9030/b
 ```
 
-Or run it without cloning, in a GitHub Codespace:
-https://codespaces.new/wavebeem/nextjs-issue-89192-repro?quickstart=1
+Or run it without cloning:
 
-The devcontainer auto-installs, builds, and starts the production server on
-attach---watch the terminal for the `[lib-l] state module executed, count=N`
-lines, and open the forwarded port 9030 for the demo page. (If the server
-isn't running, just run `npm run build && npm run start` manually.)
+- **CodeSandbox** (VM sandbox via synced template):
+  https://githubbox.com/wavebeem/nextjs-issue-89192-repro ---
+  `.codesandbox/tasks.json` auto-installs, builds, and starts the production
+  server; the `count=1/2/3` log lines show up in the task terminal and the
+  preview opens the demo page.
+- **GitHub Codespaces**:
+  https://codespaces.new/wavebeem/nextjs-issue-89192-repro?quickstart=1 ---
+  the devcontainer does the same on attach; open the forwarded port 9030.
 
-Requires Node 20+ (anything that runs Next.js 16).
+Either way, if the server isn't running, `npm run build && npm run start`
+starts it manually. Requires Node 20+ (anything that runs Next.js 16).
 
 **Expected:** the server log shows `count=1` once, and `/b` reports
 `isBaseToken(...) === true` for every token.
