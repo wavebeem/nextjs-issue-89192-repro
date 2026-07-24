@@ -18,23 +18,35 @@ the same module, three separate copies of its module-level state.
 
 `lib-l` is a stand-in for any package that keeps module-level state (the AWS
 SDK's exception classes, `@react-aria`'s `observerStack`, Sentry's singletons,
-any `Context`/registry/cache). Its state module counts how many times it runs:
+any `Context`/registry/cache). It's a single ESM file
+([`packages/lib-l/index.js`](packages/lib-l/index.js)) that counts how many
+times it runs and exports a class for `instanceof` checks:
 
 ```js
 globalThis.__L_EXEC = (globalThis.__L_EXEC ?? 0) + 1;
-console.log(`[lib-l] state module executed, count=${globalThis.__L_EXEC}`);
+console.log(`[lib-l] module executed, count=${globalThis.__L_EXEC}`);
+
+export function getExecCount() {
+  return globalThis.__L_EXEC;
+}
+
+export class Token {}
+
+export function isToken(value) {
+  return value instanceof Token;
+}
 ```
 
-It also exports `class BaseToken`, `class TokenA extends BaseToken`, and
-`isBaseToken(value)` (an `instanceof BaseToken` check), mirroring the AWS SDK
+The `isToken` check mirrors the AWS SDK's
 `error instanceof AccessDeniedException` pattern from the original issue.
 
 Three entry points import it:
 
-- `instrumentation.js` --- creates a `TokenA` at boot
-- `app/a/route.js` (App Router) --- creates a `TokenA` per request
-- `pages/api/p.js` (Pages Router) --- creates a `TokenA` per request
-- `app/b/route.js` (App Router) --- checks all three tokens with `isBaseToken`
+- `instrumentation.js` --- creates a `Token` at boot
+- `app/create/route.js` (App Router) --- creates a `Token` per request
+- `pages/api/create.js` (Pages Router) --- creates a `Token` per request
+
+and `app/check/route.js` (App Router) checks all three tokens with `isToken`.
 
 ## Steps to reproduce
 
@@ -47,9 +59,9 @@ Open http://localhost:9030 and click **Run the demo** --- it hits the three
 routes and renders a pass/fail verdict. Or curl them directly:
 
 ```bash
-curl localhost:9030/a
-curl localhost:9030/api/p
-curl localhost:9030/b
+curl localhost:9030/create
+curl localhost:9030/api/create
+curl localhost:9030/check
 ```
 
 Or run it without cloning:
@@ -66,34 +78,31 @@ Or run it without cloning:
 Either way, if the server isn't running, `npm run build && npm run start`
 starts it manually. Requires Node 20+ (anything that runs Next.js 16).
 
-**Expected:** the server log shows `count=1` once, and `/b` reports
-`isBaseToken(...) === true` for every token.
+**Expected:** the server log shows `count=1` once, and `/check` reports
+`true` for every token.
 
 **Actual** (Next.js 16.2.11, Turbopack production build):
 
 Server log --- one process, three executions:
 
 ```
-[lib-l] state module executed, count=1
-[instrumentation] created a TokenA, lib-l exec count=1
-[lib-l] state module executed, count=2
-[lib-l] state module executed, count=3
+[lib-l] module executed, count=1
+[instrumentation] created a Token, lib-l exec count=1
+[lib-l] module executed, count=2
+[lib-l] module executed, count=3
 ```
 
-`/b` --- a `TokenA` made by instrumentation or by the Pages Router is **not**
-`instanceof BaseToken` according to App Router code:
+`/check` --- a `Token` made by instrumentation or by the Pages Router is
+**not** `instanceof Token` according to App Router code:
 
 ```json
 {
-  "route": "b",
-  "pid": 49297,
+  "route": "app router /check",
+  "pid": 93037,
   "execCount": 3,
-  "receivedTokenFromA": true,
-  "tokenFromAIsBaseToken": true,
-  "receivedTokenFromPages": true,
-  "tokenFromPagesIsBaseToken": false,
-  "receivedTokenFromInstrumentation": true,
-  "tokenFromInstrumentationIsBaseToken": false
+  "tokenFromAppIsToken": true,
+  "tokenFromPagesIsToken": false,
+  "tokenFromInstrumentationIsToken": false
 }
 ```
 
@@ -120,7 +129,7 @@ loads its own third copy. Same process, no shared module registry, so
 module-id dedup never gets a chance to fire:
 
 ```bash
-grep -rl "state module executed" .next/server --include="*.js"
+grep -rl "module executed" .next/server --include="*.js"
 ```
 
 ## Notes
@@ -151,15 +160,16 @@ graph `require()`s the same file from `node_modules` via Node's module cache:
 serverExternalPackages: ["lib-l"];
 ```
 
-With that enabled, `execCount` stays `1` and every `isBaseToken` check passes.
-(This only works for real packages---not for code compiled into the bundle---
-and silently stops working if the package must be bundled, e.g. for the edge
-runtime.)
+With that enabled, `execCount` stays `1` and every `isToken` check passes.
+(This only works for real packages in `node_modules`: we verified that with a
+symlinked `file:packages/lib-l` directory dependency,
+`serverExternalPackages` has no effect and the count stays 3---which is why
+this repo installs lib-l from a packed tarball instead.)
 
 ## Versions
 
 - next 16.2.11 (also verified on 16.3.0-canary.94), react 19.2.8
-- `lib-l` is a local CJS package installed from a packed tarball
-  (`packages/lib-l-1.0.0.tgz`), mimicking the AWS SDK's `dist-cjs` shape. If
-  you edit `packages/lib-l`, re-run:
+- `lib-l` is installed from a packed tarball (`packages/lib-l-1.0.0.tgz`) so
+  it's a real copy in `node_modules`, like any npm dependency. If you edit
+  `packages/lib-l`, re-run:
   `(cd packages/lib-l && npm pack --pack-destination ..) && npm i`

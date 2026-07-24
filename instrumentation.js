@@ -1,8 +1,8 @@
-import { TokenA, getExecCount } from "lib-l";
+import { Token, getExecCount } from "lib-l";
 
 export function register() {
-  globalThis.__TOKEN_FROM_INSTRUMENTATION = new TokenA();
+  globalThis.__TOKEN_FROM_INSTRUMENTATION = new Token();
   console.log(
-    `[instrumentation] created a TokenA, lib-l exec count=${getExecCount()}`
+    `[instrumentation] created a Token, lib-l exec count=${getExecCount()}`
   );
 }

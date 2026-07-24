@@ -1,11 +1,11 @@
-import { TokenA, getExecCount } from "lib-l";
+import { Token, getExecCount } from "lib-l";
 
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  globalThis.__TOKEN_FROM_A = new TokenA();
+  globalThis.__TOKEN_FROM_APP = new Token();
   return Response.json({
-    route: "a",
+    route: "app router /create",
     pid: process.pid,
     execCount: getExecCount(),
   });

@@ -3,35 +3,35 @@
 import { useState } from "react";
 
 const steps = [
-  { path: "/a", label: "App Router route creates a TokenA" },
-  { path: "/api/p", label: "Pages Router route creates a TokenA" },
-  { path: "/b", label: "App Router route checks every token" },
+  { path: "/create", label: "App Router route creates a Token" },
+  { path: "/api/create", label: "Pages Router route creates a Token" },
+  { path: "/check", label: "App Router route checks every token" },
 ];
 
 function Verdict({ report }) {
   const checks = [
     {
       ok: report.execCount === 1,
-      text: `lib-l module executed ${report.execCount} time(s) in pid ${report.pid} (expected: 1)`,
+      text: `lib-l executed ${report.execCount} time(s) in pid ${report.pid} (expected: 1)`,
     },
     {
-      ok: report.tokenFromAIsBaseToken,
-      text: "TokenA from the App Router route is instanceof BaseToken",
+      ok: report.tokenFromAppIsToken,
+      text: "Token from the App Router route is instanceof Token",
     },
     {
-      ok: report.tokenFromPagesIsBaseToken,
-      text: "TokenA from the Pages Router route is instanceof BaseToken",
+      ok: report.tokenFromPagesIsToken,
+      text: "Token from the Pages Router route is instanceof Token",
     },
     {
-      ok: report.tokenFromInstrumentationIsBaseToken,
-      text: "TokenA from instrumentation.js is instanceof BaseToken",
+      ok: report.tokenFromInstrumentationIsToken,
+      text: "Token from instrumentation.js is instanceof Token",
     },
   ];
 
   return (
     <ul style={{ listStyle: "none", padding: 0 }}>
       {checks.map((check) => (
-        <li key={check.text} style={{ margin: "0.25rem 0" }}>
+        <li key={check.text}>
           {check.ok ? "✅" : "❌"} {check.text}
         </li>
       ))}
@@ -54,8 +54,6 @@ export function Demo() {
     setRunning(false);
   }
 
-  const report = results?.at(-1)?.data;
-
   return (
     <div>
       <button
@@ -70,7 +68,7 @@ export function Demo() {
       {results && (
         <>
           <h2>Verdict</h2>
-          <Verdict report={report} />
+          <Verdict report={results.at(-1).data} />
           <h2>Raw responses</h2>
           {results.map((result) => (
             <div key={result.path}>
@@ -90,7 +88,7 @@ export function Demo() {
           ))}
           <p>
             The server log shows each execution as it happens:{" "}
-            <code>[lib-l] state module executed, count=N</code>
+            <code>[lib-l] module executed, count=N</code>
           </p>
         </>
       )}
